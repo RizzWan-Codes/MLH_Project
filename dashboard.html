@@ -307,6 +307,52 @@
         .glow-red {
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
+
+        /* Control Panel */
+.control-panel {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile adjustments for control panel */
+@media (max-width: 768px) {
+    .control-panel {
+        bottom: 80px; /* Move it higher on mobile */
+        padding: 12px 16px;
+        gap: 12px;
+        max-width: 90%;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .control-panel button {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+    
+    .control-panel #locationStatus {
+        width: 100%;
+        justify-content: center;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .control-panel .w-px {
+        display: none; /* Hide separator on mobile */
+    }
+}
     </style>
 </head>
 <body class="bg-dark-950 text-white antialiased">
@@ -601,34 +647,45 @@
         // ================================
         // AUTHENTICATION STATE HANDLER
         // ================================
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log('User authenticated:', user.uid);
-                window.currentUser = user;
-                
-                // Load user data from Firestore
-                await loadUserData(user);
-                
-                // Initialize the map
-                initializeMap();
-                
-                // Setup leaderboard listener
-                setupLeaderboardListener();
-                
-                // Start GPS tracking
-                startGPSTracking();
-                
-                // Hide loading overlay
-                setTimeout(() => {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                }, 500);
-                
-            } else {
-                // Not authenticated, redirect to login
-                console.log('User not authenticated, redirecting...');
-                window.location.href = 'login.html';
-            }
-        });
+        // ================================
+// AUTHENTICATION STATE HANDLER
+// ================================
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        console.log('User authenticated:', user.uid);
+        window.currentUser = user;
+        
+        // Load user data from Firestore
+        await loadUserData(user);
+        
+        // Initialize the map
+        initializeMap();
+        
+        // Setup leaderboard listener
+        setupLeaderboardListener();
+        
+        // Start GPS tracking
+        startGPSTracking();
+        
+        // Hide loading overlay
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }, 500);
+        
+    } else {
+        // Not authenticated, redirect to login immediately
+        console.log('User not authenticated, redirecting to login...');
+        
+        // Show message before redirect
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        loadingOverlay.querySelector('p').textContent = 'Not authenticated. Redirecting to login...';
+        
+        // Redirect after short delay
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1000);
+    }
+});
 
         // ================================
         // LOAD USER DATA
@@ -1483,7 +1540,15 @@
 
     // Remove existing safe zone
     if (window.safeZoneCircle) {
-        window.safeZoneCircle.remove();
+        try {
+            window.safeZoneCircle.remove();
+        } catch (e) {
+            // If remove() doesn't work, try setMap(null)
+            if (window.safeZoneCircle.setMap) {
+                window.safeZoneCircle.setMap(null);
+            }
+        }
+        window.safeZoneCircle = null;
     }
 
     // Create new safe zone circle
