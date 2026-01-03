@@ -329,7 +329,7 @@
 /* Mobile adjustments for control panel */
 @media (max-width: 768px) {
     .control-panel {
-        bottom: 80px; /* Move it higher on mobile */
+        bottom: 100px; /* Move it higher on mobile */
         padding: 12px 16px;
         gap: 12px;
         max-width: 90%;
@@ -628,6 +628,15 @@
         window.safeZoneCircle = null;
         window.trailPolyline = null;
         window.capturedPolygons = [];
+        // Add these to existing global state variables
+window.lastSafeZoneUpdate = null;
+window.lastSafeZonePosition = null;
+// Add to existing global state
+window.allSafeZoneCircles = []; // Track ALL circles
+window.lastSafeZoneUpdate = null;
+window.lastSafeZonePosition = null;
+window.allSafeZoneCircles = [];
+window.safeZoneTimeout = null; // NEW - for debouncing
 
         // Run State
         window.isRunning = false;
@@ -1505,7 +1514,6 @@ onAuthStateChanged(auth, async (user) => {
         if (window.userMarker) {
             window.userMarker.setPosition(new mappls.LatLng(lat, lng));
         } else {
-            // Create user marker with custom HTML
             const markerDiv = document.createElement('div');
             markerDiv.innerHTML = `
                 <div style="position: relative; width: 24px; height: 24px;">
@@ -1522,10 +1530,29 @@ onAuthStateChanged(auth, async (user) => {
             });
         }
 
-        // Update or create safe zone circle
-        if (!window.isRunning) {
-            updateSafeZone(lat, lng);
-        }
+        // Only update safe zone if not running
+        const SAFEZONE_MOVE_THRESHOLD = 40; // meters
+
+if (!window.isRunning) {
+    if (!window.lastSafeZonePosition) {
+        window.lastSafeZonePosition = { lat, lng };
+        updateSafeZone(lat, lng);
+        return;
+    }
+
+    const dist = calculateDistance(
+        window.lastSafeZonePosition.lat,
+        window.lastSafeZonePosition.lng,
+        lat,
+        lng
+    );
+
+    if (dist >= SAFEZONE_MOVE_THRESHOLD) {
+        window.lastSafeZonePosition = { lat, lng };
+        updateSafeZone(lat, lng);
+    }
+}
+
 
     } else if (window.redrawFallbackMap) {
         window.redrawFallbackMap();
@@ -1535,33 +1562,30 @@ onAuthStateChanged(auth, async (user) => {
         // ================================
         // UPDATE SAFE ZONE CIRCLE
         // ================================
-        function updateSafeZone(lat, lng) {
+       function updateSafeZone(lat, lng) {
     if (!window.mapInstance || typeof mappls === 'undefined') return;
 
-    // Remove existing safe zone
+    // REMOVE existing zone
     if (window.safeZoneCircle) {
         try {
             window.safeZoneCircle.remove();
-        } catch (e) {
-            // If remove() doesn't work, try setMap(null)
-            if (window.safeZoneCircle.setMap) {
-                window.safeZoneCircle.setMap(null);
-            }
-        }
+        } catch (e) {}
         window.safeZoneCircle = null;
     }
 
-    // Create new safe zone circle
+    // CREATE new one
     window.safeZoneCircle = new mappls.Circle({
         map: window.mapInstance,
         center: new mappls.LatLng(lat, lng),
-        radius: window.SAFE_ZONE_RADIUS, // radius in meters
+        radius: window.SAFE_ZONE_RADIUS,
         strokeColor: '#10B981',
         strokeOpacity: 0.8,
         strokeWeight: 2,
         fillColor: '#10B981',
         fillOpacity: 0.15
     });
+
+    console.log('Safe zone updated');
 }
 
         // ================================
@@ -1609,49 +1633,67 @@ onAuthStateChanged(auth, async (user) => {
         // START RUN
         // ================================
         function startRun() {
-            if (!window.currentPosition) {
-                showToast('Waiting for GPS signal...', 'warning');
-                return;
-            }
+    if (!window.currentPosition) {
+        showToast('Waiting for GPS signal...', 'warning');
+        return;
+    }
 
-            if (window.isRunning) return;
+    if (window.isRunning) return;
 
-            console.log('Starting run...');
-            
-            // Initialize run state
-            window.isRunning = true;
-            window.runPath = [];
-            window.runStartTime = Date.now();
+    console.log('Starting run...');
+    
+    // Initialize run state
+    window.isRunning = true;
+    window.runPath = [];
+    window.runStartTime = Date.now();
 
-            // Record starting position
-            window.runPath.push({
-                lat: window.currentPosition.lat,
-                lng: window.currentPosition.lng,
-                timestamp: Date.now()
-            });
+    // Record starting position
+    window.runPath.push({
+        lat: window.currentPosition.lat,
+        lng: window.currentPosition.lng,
+        timestamp: Date.now()
+    });
 
-            // Update UI
-            document.getElementById('startRunBtn').classList.add('hidden');
-            document.getElementById('stopRunBtn').classList.remove('hidden');
-            document.getElementById('stopRunBtn').classList.add('flex');
-            document.getElementById('runStatsOverlay').classList.remove('hidden');
-            
-            setRunStatus('running');
+    // Update UI
+    document.getElementById('startRunBtn').classList.add('hidden');
+    document.getElementById('stopRunBtn').classList.remove('hidden');
+    document.getElementById('stopRunBtn').classList.add('flex');
+    document.getElementById('runStatsOverlay').classList.remove('hidden');
+    
+    setRunStatus('running');
 
-            // Hide safe zone when running
-            if (window.safeZoneCircle) {
-                window.safeZoneCircle.remove();
-                window.safeZoneCircle = null;
-            }
-
-            // Start run timer
-            window.runTimer = setInterval(updateRunTimer, 1000);
-
-            // Create trail polyline on map
-            initializeTrailOnMap();
-
-            showToast('Run started! Create a loop to capture territory.', 'success');
+    // Hide safe zone when running - UPDATED
+    if (window.safeZoneCircle) {
+        try {
+            window.safeZoneCircle.remove();
+        } catch (e) {
+            console.warn('Error removing safe zone on start:', e);
         }
+        window.safeZoneCircle = null;
+    }
+
+    // Remove ALL tracked circles - NEW
+    if (window.allSafeZoneCircles && window.allSafeZoneCircles.length > 0) {
+        window.allSafeZoneCircles.forEach(circle => {
+            try {
+                if (circle && typeof circle.remove === 'function') {
+                    circle.remove();
+                }
+            } catch (e) {
+                console.warn('Error removing tracked circle:', e);
+            }
+        });
+        window.allSafeZoneCircles = [];
+    }
+
+    // Start run timer
+    window.runTimer = setInterval(updateRunTimer, 1000);
+
+    // Create trail polyline on map
+    initializeTrailOnMap();
+
+    showToast('Run started! Create a loop to capture territory.', 'success');
+}
 
         window.startRun = startRun;
 
