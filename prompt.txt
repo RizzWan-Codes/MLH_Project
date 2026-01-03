@@ -1,0 +1,177 @@
+You are building a real-world, location-based competitive fitness web app called "Territory Run".
+
+--------------------------------
+CORE IDEA (UNDERSTAND THIS FIRST)
+--------------------------------
+
+Territory Run turns real-world movement into a competitive game.
+
+Each user represents a moving point on a map using live GPS data from their device.
+Every user starts with a small safe zone.
+
+When a user moves outside their safe zone, their path creates a visible trail.
+If the user returns back to their safe zone and closes the path into a loop, the enclosed real-world area is captured and permanently added to their territory.
+
+Captured territory increases:
+- Total area owned
+- Coins (in-game currency)
+- Leaderboard rank
+
+If another user crosses a player’s open trail before it is closed, the run fails and no area is captured.
+
+The goal is to move strategically in the real world to claim as much territory as possible without losing an active trail.
+
+--------------------------------
+WHY THIS EXISTS
+--------------------------------
+
+Many people live sedentary lifestyles and find traditional fitness apps boring or difficult to stick with.
+
+Territory Run motivates physical activity by turning walking or running into a real-time competitive experience.
+Users exercise naturally while playing, without feeling like they are “working out”.
+
+--------------------------------
+MULTIPLAYER & SERVERS
+--------------------------------
+
+Users play inside geographic servers.
+Each server represents a limited real-world region (city, campus, or event zone).
+
+Users can:
+- Join one server at a time
+- Compete only with players inside the same server
+- View leaderboards per server
+
+For the MVP, implement only ONE default server.
+
+--------------------------------
+GAME ECONOMY
+--------------------------------
+
+Users earn coins by:
+- Capturing area
+- Successfully completing runs
+- Maintaining activity streaks (optional)
+
+Coins are stored in Firebase and displayed on the dashboard.
+
+--------------------------------
+SAFETY & ETHICS
+--------------------------------
+
+The app must:
+- Display a safety warning not to run into traffic or restricted areas
+- Work only on pedestrian movement
+- Handle GPS permission denial gracefully
+
+--------------------------------
+TECH STACK (STRICT)
+--------------------------------
+
+- HTML (separate files)
+- Tailwind CSS via CDN ONLY
+- Vanilla JavaScript ONLY
+- Firebase v9 modular SDK
+- Firebase Authentication (Email/Password + Google)
+- Firestore for storing user data
+
+DO NOT use:
+- Frameworks (React, Vue, Next.js)
+- Backend servers
+- Paid APIs
+- CSS files
+
+--------------------------------
+PAGES TO BUILD
+--------------------------------
+
+1) index.html (Landing Page)
+2) login.html (Authentication)
+3) dashboard.html (Main Application)
+
+--------------------------------
+index.html — Landing Page
+--------------------------------
+
+Purpose:
+Explain the idea clearly to a new user.
+
+Must include:
+- Hero section with app name and tagline
+- Explanation of how territory capture works in simple steps
+- Why it encourages real-world movement
+- Call-to-action button → login.html
+- Dark modern UI
+- Mobile responsiveness
+
+--------------------------------
+login.html — Authentication
+--------------------------------
+
+Requirements:
+- Firebase Authentication
+- Login and Signup:
+  - Email + Password
+  - Google Sign-In
+- Handle errors clearly
+- Auto-redirect logged-in users to dashboard.html
+
+--------------------------------
+dashboard.html — Main Application
+--------------------------------
+
+Requirements:
+- Block unauthenticated users
+- Display:
+  - User name
+  - Coins
+  - Total captured area
+- Buttons:
+  - Start Run
+  - Stop Run
+- Use browser Geolocation API to track movement
+- Store path coordinates during a run
+- Detect when a loop is closed
+- Calculate enclosed area (simple polygon math is acceptable)
+- Update Firestore on success
+- Simulate a basic 2D map using canvas or divs
+- Show a leaderboard sorted by total area
+- Logout button
+
+--------------------------------
+FIREBASE STRUCTURE
+--------------------------------
+
+Firestore:
+users:
+  uid:
+    name
+    email
+    coins
+    totalArea
+
+--------------------------------
+CODE RULES
+--------------------------------
+
+- Provide FULL runnable code for:
+  - index.html
+  - login.html
+  - dashboard.html
+- Use comments to explain logic
+- Use async/await
+- Keep everything MVP-level and hackathon-friendly
+
+--------------------------------
+DELIVERABLE FORMAT
+--------------------------------
+
+Return the final answer as:
+1) index.html
+2) login.html
+3) dashboard.html
+
+
+Dont use emojis, always use svg.
+
+lets go with first index.html.
