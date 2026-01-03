@@ -3,55 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Territory Run</title>
+    <title>Access Territory - Territory Run</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#10B981', // Emerald
-                        secondary: '#3B82F6', // Blue
-                        dark: {
-                            950: '#050507',
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1a1a24',
-                            600: '#24242f'
-                        },
-                        accent: '#F59E0B' // Amber
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        dark: { 950: '#050507', 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24' },
+                        accent: '#F59E0B'
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif']
-                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'spin-slow': 'spin 3s linear infinite',
+                        'spin-slow': 'spin 1s linear infinite', /* Faster spin for refresh icon */
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '50%': { transform: 'translateY(-5px)' },
                         }
                     }
                 }
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        @keyframes subtle-float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-        }
-        
+        /* Floating Card Animation */
         .card-float { animation: subtle-float 8s ease-in-out infinite; }
+        @keyframes subtle-float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
 
+        /* Autofill Styling */
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus, 
@@ -60,6 +48,14 @@
             -webkit-text-fill-color: white !important;
             transition: background-color 5000s ease-in-out 0s;
         }
+
+        /* Form Toggle Transitions */
+        .hidden-form { display: none; opacity: 0; transform: scale(0.95); }
+        .visible-form { display: block; opacity: 1; transform: scale(1); animation: fadeIn 0.4s forwards; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .strength-bar { transition: width 0.3s ease, background-color 0.3s ease; }
     </style>
 </head>
 <body class="bg-dark-950 text-white antialiased h-screen w-screen relative flex items-center justify-center">
@@ -67,115 +63,225 @@
     <canvas id="bgCanvas" class="absolute inset-0 z-0"></canvas>
     <div class="absolute inset-0 z-0 bg-radial-gradient from-transparent to-dark-950/90 pointer-events-none"></div>
 
-    <div class="relative z-10 w-full max-w-md px-6 card-float">
+    <div class="relative z-10 w-full max-w-md px-6 card-float my-auto h-full max-h-screen overflow-y-auto hide-scrollbar flex items-center">
         
-        <div class="text-center mb-6">
-            <a href="index.html" class="inline-flex items-center space-x-3 group cursor-pointer transition-transform hover:scale-105">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                    <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                        <line x1="9" y1="3" x2="9" y2="18"/>
-                        <line x1="15" y1="6" x2="15" y2="21"/>
-                    </svg>
-                </div>
-                <span class="text-xl font-bold tracking-tight">
-                    Territory<span class="text-primary">Run</span>
-                </span>
-            </a>
-        </div>
-
-        <div class="bg-dark-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-            
-            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                <div class="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/5 to-transparent rotate-45 transform translate-y-full animate-[shimmer_3s_infinite]"></div>
+        <div class="w-full">
+            <div class="text-center mb-6">
+                <a href="index.html" class="inline-flex items-center space-x-3 group cursor-pointer transition-transform hover:scale-105">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                            <line x1="9" y1="3" x2="9" y2="18"/>
+                            <line x1="15" y1="6" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">
+                        Territory<span class="text-primary">Run</span>
+                    </span>
+                </a>
             </div>
 
-            <form class="space-y-6 relative z-10">
+            <div class="bg-dark-900/70 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative overflow-hidden transition-all duration-300" id="mainCard">
                 
-                <div class="flex flex-col items-center justify-center mb-2">
-                    <div class="relative group/avatar cursor-pointer" onclick="generateNewAvatar()">
-                        <div class="w-24 h-24 rounded-full bg-dark-800 border-2 border-primary/30 p-1 shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300 group-hover/avatar:border-primary group-hover/avatar:shadow-[0_0_30px_rgba(16,185,129,0.3)] animate-float">
-                            <img id="userAvatar" src="" alt="User Avatar" class="w-full h-full rounded-full bg-dark-700 object-cover">
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+                </div>
+
+                <div id="loginForm" class="visible-form">
+                    <div class="mb-6 text-center">
+                        <h2 class="text-2xl font-bold">Welcome Back</h2>
+                        <p class="text-sm text-gray-400 mt-1">Enter your coordinates to resume.</p>
+                    </div>
+
+                    <form class="space-y-5">
+                        <div class="group/input">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Email</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <input type="email" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
+                            </div>
                         </div>
+
+                        <div class="group/input">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider">Access Key</label>
+                                <a href="#" class="text-xs text-primary hover:text-emerald-400 transition-colors">Forgot?</a>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
+                                <input type="password" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="window.location.href='index.html'" class="w-full relative group overflow-hidden bg-gradient-to-r from-primary to-emerald-600 rounded-xl px-4 py-3.5 font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
+                            <span class="relative flex items-center justify-center space-x-2">
+                                <span>Enter Territory</span>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-6 pt-6 border-t border-white/5">
+                        <p class="text-sm text-gray-500">
+                            New to the game? 
+                            <button onclick="toggleForms('signup')" class="font-medium text-white hover:text-primary transition-colors ml-1">Create Account</button>
+                        </p>
+                    </div>
+                </div>
+
+                <div id="signupForm" class="hidden-form">
+                    <div class="mb-4 text-center">
+                        <h2 class="text-2xl font-bold">New Recruit</h2>
+                        <p class="text-sm text-gray-400 mt-1">Claim your identity and start running.</p>
+                    </div>
+
+                    <form class="space-y-4">
                         
-                        <div class="absolute bottom-0 right-0 bg-dark-800 border border-white/10 rounded-full p-1.5 shadow-lg text-primary hover:text-white hover:bg-primary transition-all duration-200">
-                            <svg id="refreshIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
-                            </svg>
+                        <div class="flex items-center space-x-4 bg-dark-800/50 p-3 rounded-xl border border-white/5 mb-2">
+                            <div class="relative group/avatar cursor-pointer flex-shrink-0" onclick="generateNewAvatar()">
+                                <div class="w-16 h-16 rounded-full bg-dark-700 border border-primary/30 overflow-hidden shadow-inner relative">
+                                    <img id="userAvatar" src="" alt="Avatar" class="w-full h-full object-cover">
+                                </div>
+                                <div class="absolute bottom-0 right-0 bg-primary text-dark-950 rounded-full p-1 shadow-lg transform group-hover/avatar:scale-110 transition-transform">
+                                    <svg id="refreshIcon" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs text-primary font-semibold uppercase tracking-wider mb-0.5">Generated Identity</p>
+                                <p class="text-xs text-gray-400">Tap the icon to reroll your look.</p>
+                            </div>
                         </div>
 
-                        <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/avatar:opacity-100 transition-opacity text-[10px] text-gray-400 whitespace-nowrap">
-                            Click to reroll identity
+                        <div class="group/input">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Gamertag</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                </div>
+                                <input type="text" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="ShadowRunner99">
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-4">Your Generated Identity</p>
-                </div>
 
-                <div class="group/input">
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1.5">Email Coordinates</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <div class="group/input">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Email</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                </div>
+                                <input type="email" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
+                            </div>
                         </div>
-                        <input type="email" id="email" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
-                    </div>
-                </div>
 
-                <div class="group/input">
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label for="password" class="block text-sm font-medium text-gray-300">Access Key</label>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <div class="group/input">
+                            <label class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Create Key</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
+                                <input type="password" onkeyup="checkStrength(this.value)" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="Create password">
+                            </div>
+                            <div class="h-1 w-full bg-dark-700 mt-2 rounded-full overflow-hidden">
+                                <div id="strengthBar" class="strength-bar h-full bg-red-500 w-0"></div>
+                            </div>
                         </div>
-                        <input type="password" id="password" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="••••••••">
+
+                        <button type="button" onclick="window.location.href='index.html'" class="w-full relative group overflow-hidden bg-white text-dark-950 rounded-xl px-4 py-3.5 font-bold hover:bg-gray-100 transition-colors shadow-lg mt-2">
+                            <span class="relative flex items-center justify-center space-x-2">
+                                <span>Initialize Profile</span>
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-6 pt-6 border-t border-white/5">
+                        <p class="text-sm text-gray-500">
+                            Already have territory? 
+                            <button onclick="toggleForms('login')" class="font-medium text-primary hover:text-emerald-400 transition-colors ml-1">Login Here</button>
+                        </p>
                     </div>
                 </div>
 
-                <button type="button" onclick="window.location.href='index.html'" class="w-full relative group overflow-hidden bg-gradient-to-r from-primary to-emerald-600 rounded-xl px-4 py-3.5 font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
-                    <div class="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -translate-x-full skew-x-12 origin-left"></div>
-                    <span class="relative flex items-center justify-center space-x-2">
-                        <span>Enter Territory</span>
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </span>
-                </button>
-
-                <div class="text-center mt-6">
-                    <p class="text-sm text-gray-500">
-                        New to the game? 
-                        <a href="#" class="font-medium text-white hover:text-primary transition-colors">Create Account</a>
-                    </p>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. DiceBear Random Avatar Generator ---
+        // --- 1. Form Toggling Logic ---
+        function toggleForms(target) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (target === 'signup') {
+                loginForm.classList.remove('visible-form');
+                loginForm.classList.add('hidden-form');
+                setTimeout(() => {
+                    signupForm.classList.remove('hidden-form');
+                    signupForm.classList.add('visible-form');
+                    // Ensure avatar is loaded if not already
+                    if(document.getElementById('userAvatar').src === "" || document.getElementById('userAvatar').src.includes(window.location.href)) {
+                        generateNewAvatar();
+                    }
+                }, 100);
+            } else {
+                signupForm.classList.remove('visible-form');
+                signupForm.classList.add('hidden-form');
+                setTimeout(() => {
+                    loginForm.classList.remove('hidden-form');
+                    loginForm.classList.add('visible-form');
+                }, 100);
+            }
+        }
+
+        // --- 2. Avatar Generator ---
         function generateNewAvatar() {
             const img = document.getElementById('userAvatar');
             const icon = document.getElementById('refreshIcon');
+            
+            // Add spin animation
+            icon.classList.add('animate-spin-slow');
+            
             const seed = Math.random().toString(36).substring(7);
             const apiUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear`;
             
-            icon.classList.add('animate-spin');
             img.src = apiUrl;
+            
+            // Remove spin after delay
             setTimeout(() => {
-                icon.classList.remove('animate-spin');
-            }, 500);
+                icon.classList.remove('animate-spin-slow');
+            }, 600);
         }
+
+        // Initialize avatar once on load so it's ready
         generateNewAvatar();
 
-        // --- 2. Automatic Digital Terrain Wave Background ---
+        // --- 3. Password Strength Logic ---
+        function checkStrength(password) {
+            const bar = document.getElementById('strengthBar');
+            let strength = 0;
+            if (password.length > 5) strength += 1;
+            if (password.length > 8) strength += 1;
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            
+            if (password.length === 0) {
+                bar.style.width = '0%';
+            } else if (strength <= 1) {
+                bar.style.width = '25%'; bar.style.backgroundColor = '#EF4444'; // Red
+            } else if (strength <= 3) {
+                bar.style.width = '65%'; bar.style.backgroundColor = '#F59E0B'; // Amber
+            } else {
+                bar.style.width = '100%'; bar.style.backgroundColor = '#10B981'; // Green
+            }
+        }
+
+        // --- 4. Background Wave Animation ---
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let width, height;
-        
-        // Grid Configuration
         const gridSize = 50;
         
         function resize() {
@@ -184,73 +290,35 @@
             canvas.width = width;
             canvas.height = height;
         }
-        
         window.addEventListener('resize', resize);
         resize();
         
         function draw() {
-            // Clear background
             ctx.fillStyle = '#050507'; 
             ctx.fillRect(0, 0, width, height);
-            
-            // Current time for animation
-            const time = Date.now() * 0.0015; // Speed of the wave
+            const time = Date.now() * 0.0015;
             
             for (let x = 0; x <= width + gridSize; x += gridSize) {
                 for (let y = 0; y <= height + gridSize; y += gridSize) {
-                    
-                    // Create a diagonal wave using Sine + Cosine based on X/Y coordinates and Time
-                    // This math creates a "rolling hills" effect across the grid
                     const waveX = Math.sin((x * 0.004) + time);
                     const waveY = Math.cos((y * 0.004) + time);
-                    const combinedWave = (waveX + waveY) / 2; // Value between -1 and 1
-                    
-                    // Map wave value to Opacity (0.05 to 0.4)
-                    // If the wave is at its peak, it gets brighter
+                    const combinedWave = (waveX + waveY) / 2;
                     let opacity = 0.03 + (Math.max(0, combinedWave) * 0.25);
                     
-                    // Color Logic:
-                    // Base color is white/gray. 
-                    // Peaks of the wave turn slightly Green (Primary) to look like "active territory"
                     let r = 255, g = 255, b = 255;
-                    
                     if (combinedWave > 0.5) {
-                        // Blend towards Emerald Green (#10B981 => 16, 185, 129)
-                        // Simple linear interpolation
-                        const intensity = (combinedWave - 0.5) * 2; // 0 to 1
-                        r = 255 - (239 * intensity); // Towards 16
-                        g = 255 - (70 * intensity);  // Towards 185
-                        b = 255 - (126 * intensity); // Towards 129
+                        const intensity = (combinedWave - 0.5) * 2;
+                        r = 255 - (239 * intensity); g = 255 - (70 * intensity); b = 255 - (126 * intensity);
                     }
 
                     ctx.lineWidth = 1;
                     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-                    
-                    // Draw Horizontal Line segment
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x + gridSize, y);
-                    ctx.stroke();
-                    
-                    // Draw Vertical Line segment
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(x, y + gridSize);
-                    ctx.stroke();
-
-                    // Optional: Draw intersection dots only on "high energy" points
-                    if (combinedWave > 0.7) {
-                        ctx.beginPath();
-                        ctx.fillStyle = `rgba(16, 185, 129, ${opacity})`;
-                        ctx.arc(x, y, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
+                    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + gridSize, y); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + gridSize); ctx.stroke();
                 }
             }
-            
             requestAnimationFrame(draw);
         }
-        
         draw();
     </script>
 </body>
