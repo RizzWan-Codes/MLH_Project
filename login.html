@@ -18,7 +18,7 @@
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'spin-slow': 'spin 1s linear infinite', /* Faster spin for refresh icon */
+                        'spin-slow': 'spin 1s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -56,6 +56,13 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .strength-bar { transition: width 0.3s ease, background-color 0.3s ease; }
+
+        /* Disabled Button State */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
     </style>
 </head>
 <body class="bg-dark-950 text-white antialiased h-screen w-screen relative flex items-center justify-center">
@@ -101,7 +108,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                 </div>
-                                <input type="email" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
+                                <input type="email" id="loginEmail" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
                             </div>
                         </div>
 
@@ -114,11 +121,11 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
-                                <input type="password" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="••••••••">
+                                <input type="password" id="loginPass" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="••••••••">
                             </div>
                         </div>
 
-                        <button type="button" onclick="window.location.href='index.html'" class="w-full relative group overflow-hidden bg-gradient-to-r from-primary to-emerald-600 rounded-xl px-4 py-3.5 font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
+                        <button type="button" id="loginBtn" disabled class="w-full relative group overflow-hidden bg-gradient-to-r from-primary to-emerald-600 rounded-xl px-4 py-3.5 font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all transform hover:-translate-y-0.5">
                             <span class="relative flex items-center justify-center space-x-2">
                                 <span>Enter Territory</span>
                                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -163,7 +170,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                 </div>
-                                <input type="text" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="ShadowRunner99">
+                                <input type="text" id="signupGamertag" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="ShadowRunner99">
                             </div>
                         </div>
 
@@ -173,7 +180,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                                 </div>
-                                <input type="email" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
+                                <input type="email" id="signupEmail" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="runner@territory.com">
                             </div>
                         </div>
 
@@ -183,14 +190,14 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-500 group-focus-within/input:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
-                                <input type="password" onkeyup="checkStrength(this.value)" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="Create password">
+                                <input type="password" id="signupPass" onkeyup="checkStrength(this.value)" class="block w-full pl-10 pr-3 py-3 bg-dark-800 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="Create password">
                             </div>
                             <div class="h-1 w-full bg-dark-700 mt-2 rounded-full overflow-hidden">
                                 <div id="strengthBar" class="strength-bar h-full bg-red-500 w-0"></div>
                             </div>
                         </div>
 
-                        <button type="button" onclick="window.location.href='index.html'" class="w-full relative group overflow-hidden bg-white text-dark-950 rounded-xl px-4 py-3.5 font-bold hover:bg-gray-100 transition-colors shadow-lg mt-2">
+                        <button type="button" id="signupBtn" disabled class="w-full relative group overflow-hidden bg-white text-dark-950 rounded-xl px-4 py-3.5 font-bold hover:bg-gray-100 transition-colors shadow-lg mt-2">
                             <span class="relative flex items-center justify-center space-x-2">
                                 <span>Initialize Profile</span>
                             </span>
@@ -210,7 +217,58 @@
     </div>
 
     <script>
-        // --- 1. Form Toggling Logic ---
+        // --- 1. Form Validation Logic ---
+        
+        // Login Validation
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPass = document.getElementById('loginPass');
+        const loginBtn = document.getElementById('loginBtn');
+
+        function validateLogin() {
+            if (loginEmail.value.trim() !== "" && loginPass.value.trim() !== "") {
+                loginBtn.disabled = false;
+            } else {
+                loginBtn.disabled = true;
+            }
+        }
+
+        loginEmail.addEventListener('input', validateLogin);
+        loginPass.addEventListener('input', validateLogin);
+
+        // Click Handler for Login
+        loginBtn.addEventListener('click', () => {
+            if (!loginBtn.disabled) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Signup Validation
+        const signupGamertag = document.getElementById('signupGamertag');
+        const signupEmail = document.getElementById('signupEmail');
+        const signupPass = document.getElementById('signupPass');
+        const signupBtn = document.getElementById('signupBtn');
+
+        function validateSignup() {
+            if (signupGamertag.value.trim() !== "" && signupEmail.value.trim() !== "" && signupPass.value.trim() !== "") {
+                signupBtn.disabled = false;
+            } else {
+                signupBtn.disabled = true;
+            }
+        }
+
+        signupGamertag.addEventListener('input', validateSignup);
+        signupEmail.addEventListener('input', validateSignup);
+        signupPass.addEventListener('input', validateSignup); // Also calls checkStrength via HTML attribute
+
+        // Click Handler for Signup
+        signupBtn.addEventListener('click', () => {
+            if (!signupBtn.disabled) {
+                window.location.href = 'index.html';
+            }
+        });
+
+
+        // --- 2. Form Toggling Logic ---
         function toggleForms(target) {
             const loginForm = document.getElementById('loginForm');
             const signupForm = document.getElementById('signupForm');
@@ -221,7 +279,7 @@
                 setTimeout(() => {
                     signupForm.classList.remove('hidden-form');
                     signupForm.classList.add('visible-form');
-                    // Ensure avatar is loaded if not already
+                    // Ensure avatar is loaded
                     if(document.getElementById('userAvatar').src === "" || document.getElementById('userAvatar').src.includes(window.location.href)) {
                         generateNewAvatar();
                     }
@@ -236,12 +294,11 @@
             }
         }
 
-        // --- 2. Avatar Generator ---
+        // --- 3. Avatar Generator ---
         function generateNewAvatar() {
             const img = document.getElementById('userAvatar');
             const icon = document.getElementById('refreshIcon');
             
-            // Add spin animation
             icon.classList.add('animate-spin-slow');
             
             const seed = Math.random().toString(36).substring(7);
@@ -249,17 +306,15 @@
             
             img.src = apiUrl;
             
-            // Remove spin after delay
             setTimeout(() => {
                 icon.classList.remove('animate-spin-slow');
             }, 600);
         }
-
-        // Initialize avatar once on load so it's ready
         generateNewAvatar();
 
-        // --- 3. Password Strength Logic ---
+        // --- 4. Password Strength Logic ---
         function checkStrength(password) {
+            validateSignup(); // Re-validate button state
             const bar = document.getElementById('strengthBar');
             let strength = 0;
             if (password.length > 5) strength += 1;
@@ -278,7 +333,7 @@
             }
         }
 
-        // --- 4. Background Wave Animation ---
+        // --- 5. Background Wave Animation ---
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let width, height;
