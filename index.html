@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territory Run - Conquer Real-World Territory Through Movement</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        dark: {
+                            950: '#050507',
+                            900: '#0a0a0f',
+                            800: '#12121a',
+                            700: '#1a1a24',
+                            600: '#24242f'
+                        },
+                        accent: '#F59E0B'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+            to { box-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-glow { animation: glow 2s ease-in-out infinite alternate; }
+        .animate-dash { animation: dash 1s linear infinite; }
+        .animate-pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #24242f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a4f; }
+    </style>
+</head>
+<body class="bg-dark-950 text-white antialiased overflow-x-hidden">
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-dark-950/80 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 lg:h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                            <line x1="9" y1="3" x2="9" y2="18"/>
+                            <line x1="15" y1="6" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">
+                        Territory<span class="text-primary">Run</span>
+                    </span>
+                </a>
+                
+                <!-- Nav Links (Desktop) -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="#how-it-works" class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">How It Works</a>
+                    <a href="#features" class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">Features</a>
+                    <a href="#why" class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">Why Us</a>
+                    <div class="w-px h-6 bg-white/10 mx-2"></div>
+                    <a href="login.html" class="ml-2 bg-gradient-to-r from-primary to-emerald-600 hover:from-primary hover:to-primary text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all hover:shadow-lg hover:shadow-primary/25 flex items-center space-x-2">
+                        <span>Get Started</span>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark-900 border-t border-white/5">
+            <div class="px-4 py-6 space-y-1">
+                <a href="#how-it-works" class="block text-gray-400 hover:text-white hover:bg-white/5 transition-colors py-3 px-4 rounded-lg font-medium">How It Works</a>
+                <a href="#features" class="block text-gray-400 hover:text-white hover:bg-white/5 transition-colors py-3 px-4 rounded-lg font-medium">Features</a>
+                <a href="#why" class="block text-gray-400 hover:text-white hover:bg-white/5 transition-colors py-3 px-4 rounded-lg font-medium">Why Us</a>
+                <div class="pt-4">
+                    <a href="login.html" class="block bg-gradient-to-r from-primary to-emerald-600 text-white px-5 py-3.5 rounded-lg font-semibold text-center transition-all">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 lg:pt-0 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0">
+            <!-- Gradient orbs -->
+            <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] opacity-50"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] opacity-30"></div>
+            
+            <!-- Grid pattern -->
+            <div class="absolute inset-0 opacity-[0.02]" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><line x1=%220%22 y1=%220%22 x2=%2260%22 y2=%220%22 stroke=%22white%22 stroke-width=%221%22/><line x1=%220%22 y1=%220%22 x2=%220%22 y2=%2260%22 stroke=%22white%22 stroke-width=%221%22/></svg>');"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <!-- Left Content -->
+                <div class="text-center lg:text-left">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-8">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        </span>
+                        <span class="text-sm text-gray-300 font-medium">Location-Based Competitive Fitness</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+                        Turn Every Run Into a
+                        <span class="block mt-2 bg-gradient-to-r from-primary via-emerald-400 to-secondary bg-clip-text text-transparent">
+                            Territory Conquest
+                        </span>
+                    </h1>
+
+                    <!-- Subheadline -->
+                    <p class="text-lg lg:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                        Move in the real world. Capture actual territory. Compete with nearby players. 
+                        <span class="text-white">Get fit while dominating the map.</span>
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                        <a href="login.html" class="w-full sm:w-auto group bg-gradient-to-r from-primary to-emerald-600 hover:from-primary hover:to-primary text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-primary/25 flex items-center justify-center space-x-2">
+                            <span>Start Conquering</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </a>
+                        <a href="#how-it-works" class="w-full sm:w-auto border border-white/10 hover:border-white/20 hover:bg-white/5 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+                            </svg>
+                            <span>See How It Works</span>
+                        </a>
+                    </div>
+
+                    <!-- Trust indicators -->
+                    <div class="mt-12 pt-8 border-t border-white/5">
+                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-8 text-sm text-gray-500">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Free to Play</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>No Equipment Needed</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                                <span>Real-Time Multiplayer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual - Interactive Map Preview -->
+                <div class="relative lg:pl-8">
+                    <div class="relative">
+                        <!-- Main map container -->
+                        <div class="relative bg-dark-800 rounded-2xl border border-white/10 p-2 shadow-2xl animate-glow">
+                            <div class="aspect-[4/3] bg-dark-900 rounded-xl overflow-hidden relative">
+                                <!-- Map SVG visualization -->
+                                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300" fill="none">
+                                    <!-- Grid lines -->
+                                    <defs>
+                                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                                        </pattern>
+                                        <linearGradient id="trail-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:0.2"/>
+                                            <stop offset="100%" style="stop-color:#F59E0B;stop-opacity:1"/>
+                                        </linearGradient>
+                                        <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                        <filter id="glow-blue" x="-50%" y="-50%" width="200%" height="200%">
+                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#grid)"/>
+                                    
+                                    <!-- Roads/Streets -->
+                                    <path d="M 0 150 L 400 150" stroke="rgba(255,255,255,0.05)" stroke-width="20"/>
+                                    <path d="M 200 0 L 200 300" stroke="rgba(255,255,255,0.05)" stroke-width="20"/>
+                                    <path d="M 100 0 L 100 300" stroke="rgba(255,255,255,0.03)" stroke-width="12"/>
+                                    <path d="M 300 0 L 300 300" stroke="rgba(255,255,255,0.03)" stroke-width="12"/>
+                                    <path d="M 0 80 L 400 80" stroke="rgba(255,255,255,0.03)" stroke-width="12"/>
+                                    <path d="M 0 220 L 400 220" stroke="rgba(255,255,255,0.03)" stroke-width="12"/>
+                                    
+                                    <!-- Player 1 captured territory (green) -->
+                                    <polygon 
+                                        points="60,100 130,70 170,100 160,160 100,170 50,140" 
+                                        fill="rgba(16, 185, 129, 0.25)" 
+                                        stroke="#10B981" 
+                                        stroke-width="2"
+                                        filter="url(#glow-green)"/>
+                                    
+                                    <!-- Player 2 captured territory (blue) -->
+                                    <polygon 
+                                        points="240,80 320,60 360,110 350,180 280,190 230,150" 
+                                        fill="rgba(59, 130, 246, 0.25)" 
+                                        stroke="#3B82F6" 
+                                        stroke-width="2"
+                                        filter="url(#glow-blue)"/>
+                                    
+                                    <!-- Active trail being drawn -->
+                                    <polyline 
+                                        points="100,170 120,200 160,210 200,200 230,220" 
+                                        fill="none" 
+                                        stroke="url(#trail-gradient)" 
+                                        stroke-width="3" 
+                                        stroke-linecap="round"
+                                        stroke-dasharray="8,4"
+                                        class="animate-dash"/>
+                                    
+                                    <!-- Safe zone (starting point) -->
+                                    <circle cx="100" cy="170" r="20" fill="rgba(16, 185, 129, 0.15)" stroke="#10B981" stroke-width="1.5"/>
+                                    <circle cx="100" cy="170" r="12" fill="rgba(16, 185, 129, 0.3)" stroke="#10B981" stroke-width="1"/>
+                                    
+                                    <!-- Active player dot with pulse -->
+                                    <circle cx="230" cy="220" r="20" fill="rgba(245, 158, 11, 0.2)" class="animate-pulse"/>
+                                    <circle cx="230" cy="220" r="8" fill="#F59E0B"/>
+                                    <circle cx="230" cy="220" r="4" fill="#FCD34D"/>
+                                </svg>
+
+                                <!-- UI Overlays -->
+                                <div class="absolute top-4 left-4 flex items-center space-x-2 bg-dark-950/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/10">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                    </span>
+                                    <span class="text-xs font-medium text-gray-300">LIVE</span>
+                                </div>
+
+                                <div class="absolute top-4 right-4 bg-dark-950/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white/10">
+                                    <span class="text-xs text-gray-400">Active Players</span>
+                                    <span class="ml-2 text-sm font-bold text-white">24</span>
+                                </div>
+
+                                <div class="absolute bottom-4 left-4 right-4 bg-dark-950/90 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/10">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-xs text-gray-400 mb-0.5">Current Run</p>
+                                            <p class="text-lg font-bold text-white">0.84 km</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xs text-gray-400 mb-0.5">Est. Capture</p>
+                                            <p class="text-lg font-bold text-primary">2,400 m²</p>
+                                        </div>
+                                        <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polygon points="5 3 19 12 5 21 5 3"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating stat cards -->
+                        <div class="absolute -top-6 -right-6 bg-dark-800 border border-white/10 px-5 py-3 rounded-xl shadow-xl animate-float">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Rank</p>
+                                    <p class="text-lg font-bold text-white">#1 in City</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute -bottom-6 -left-6 bg-dark-800 border border-white/10 px-5 py-3 rounded-xl shadow-xl animate-float" style="animation-delay: 1s;">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <circle cx="12" cy="12" r="10"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-400">Earned</p>
+                                    <p class="text-lg font-bold text-white">+500 Coins</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+            <div class="flex flex-col items-center space-y-2 text-gray-500">
+                <span class="text-xs font-medium tracking-wider uppercase">Scroll</span>
+                <svg class="w-5 h-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-24 lg:py-32 bg-dark-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full mb-6">
+                    <svg class="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span class="text-sm text-primary font-medium">Simple & Addictive</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                    How Territory Run Works
+                </h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Four simple steps to turn your daily movement into an exciting competition
+                </p>
+            </div>
+
+            <!-- Steps -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <!-- Step 1 -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative bg-dark-800 border border-white/5 rounded-2xl p-8 h-full hover:border-primary/30 transition-all duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-7 h-7 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="10" r="3"/>
+                                    <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
+                                </svg>
+                            </div>
+                            <span class="text-5xl font-bold text-dark-600 group-hover:text-primary/20 transition-colors">01</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Start at Safe Zone</h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Every player begins with a small protected area. This is your home base where your trail begins and must return.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-b from-secondary/20 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative bg-dark-800 border border-white/5 rounded-2xl p-8 h-full hover:border-secondary/30 transition-all duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-14 h-14 bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-7 h-7 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <span class="text-5xl font-bold text-dark-600 group-hover:text-secondary/20 transition-colors">02</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Move & Create Trail</h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Walk or run outside your safe zone. Your GPS tracks every step, creating a visible trail on the map in real-time.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-b from-accent/20 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative bg-dark-800 border border-white/5 rounded-2xl p-8 h-full hover:border-accent/30 transition-all duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-7 h-7 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 4 23 10 17 10"/>
+                                    <polyline points="1 20 1 14 7 14"/>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                </svg>
+                            </div>
+                            <span class="text-5xl font-bold text-dark-600 group-hover:text-accent/20 transition-colors">03</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Close the Loop</h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Return to your safe zone to complete the loop. The enclosed area becomes your captured territory permanently.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="relative bg-dark-800 border border-white/5 rounded-2xl p-8 h-full hover:border-purple-500/30 transition-all duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-7 h-7 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                                    <path d="M4 22h16"/>
+                                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                                </svg>
+                            </div>
+                            <span class="text-5xl font-bold text-dark-600 group-hover:text-purple-500/20 transition-colors">04</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Earn & Compete</h3>
+                        <p class="text-gray-400 leading-relaxed text-sm">
+                            Gain coins and climb the leaderboard. Capture more area than other players to dominate your server!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Lines (Desktop only) -->
+            <div class="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white/5 to-transparent" style="margin-top: 60px;"></div>
+
+            <!-- Warning Card -->
+            <div class="mt-16 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border border-red-500/20 rounded-2xl p-6 lg:p-8">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                    <div class="w-14 h-14 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-white mb-2">Watch Out for Competitors!</h4>
+                        <p class="text-gray-400 leading-relaxed">
+                            If another player crosses your open trail before you close the loop, your run fails and you capture nothing. 
+                            Move strategically and stay alert to protect your path.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 lg:py-32 bg-dark-950 relative overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-primary/5 to-transparent rounded-full blur-3xl"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-20">
+                <div class="inline-flex items-center space-x-2 bg-secondary/10 border border-secondary/20 px-4 py-2 rounded-full mb-6">
+                    <svg class="w-4 h-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="text-sm text-secondary font-medium">Powerful Features</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                    Everything You Need to Dominate
+                </h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Built for competitive players who want to turn their city into a playground
+                </p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Feature 1: Live GPS -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-primary/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                            <line x1="9" y1="3" x2="9" y2="18"/>
+                            <line x1="15" y1="6" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Live GPS Tracking</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Real-time location tracking that maps your every move. Watch your trail grow as you explore your surroundings.
+                    </p>
+                </div>
+
+                <!-- Feature 2: Leaderboards -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-secondary/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-secondary/10 border border-secondary/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Server Leaderboards</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Compete with players in your geographic region. Climb the ranks by capturing more territory than anyone else.
+                    </p>
+                </div>
+
+                <!-- Feature 3: Coins -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-accent/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v12"/>
+                            <path d="M8 10h8"/>
+                            <path d="M8 14h8"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Coin Economy</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Earn coins for every successful capture. Build your fortune through consistent movement and strategic plays.
+                    </p>
+                </div>
+
+                <!-- Feature 4: Dashboard -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-purple-500/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Progress Dashboard</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Track your total captured area, coin balance, and ranking all in one beautiful, intuitive dashboard.
+                    </p>
+                </div>
+
+                <!-- Feature 5: Multiplayer -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-pink-500/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Real-Time Multiplayer</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Other players are moving right now. See their trails, protect your own, and intercept when the moment is right.
+                    </p>
+                </div>
+
+                <!-- Feature 6: Mobile -->
+                <div class="group bg-dark-800/50 border border-white/5 rounded-2xl p-8 hover:border-cyan-500/20 hover:bg-dark-800 transition-all duration-300">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-300">
+                        <svg class="w-6 h-6 text-cyan-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                            <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Mobile Optimized</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Play on the go with a fully responsive design. Territory Run works seamlessly on any device with GPS capability.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Section -->
+    <section id="why" class="py-24 lg:py-32 bg-dark-900 relative overflow-hidden">
+        <!-- Background decorations -->
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px]"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px]"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Content -->
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-accent/10 border border-accent/20 px-4 py-2 rounded-full mb-6">
+                        <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <span class="text-sm text-accent font-medium">The Better Way</span>
+                    </div>
+                    
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                        Fitness That Doesn't Feel Like Exercise
+                    </h2>
+                    
+                    <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+                        Traditional fitness apps rely on willpower. Territory Run replaces willpower with 
+                        <span class="text-white font-semibold">competition, strategy, and genuine fun</span>.
+                    </p>
+
+                    <!-- Benefits List -->
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">You'll Actually Want to Move</h4>
+                                <p class="text-gray-400">The competitive drive to capture more territory makes you forget you're exercising.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 bg-secondary/10 border border-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">Explore Your Neighborhood</h4>
+                                <p class="text-gray-400">Discover new streets and paths as you strategize the best routes to maximize territory.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 bg-accent/10 border border-accent/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">Real Competition, Real Stakes</h4>
+                                <p class="text-gray-400">Compete against real players in your area. Your position on the leaderboard is earned.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-5 h-5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-1">Build Healthy Habits</h4>
+                                <p class="text-gray-400">Daily movement becomes a game you look forward to, not a chore you avoid.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual - Stats Card -->
+                <div class="relative">
+                    <div class="bg-dark-800 border border-white/10 rounded-2xl p-8 shadow-2xl">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <p class="text-gray-400 text-sm mb-1">Weekly Overview</p>
+                                <h3 class="text-2xl font-bold">Your Progress</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-dark-900 rounded-xl p-5 text-center">
+                                <p class="text-3xl font-bold text-primary mb-1">10.2K</p>
+                                <p class="text-gray-400 text-sm">Avg Daily Steps</p>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-5 text-center">
+                                <p class="text-3xl font-bold text-secondary mb-1">5.8</p>
+                                <p class="text-gray-400 text-sm">Km Today</p>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-5 text-center">
+                                <p class="text-3xl font-bold text-accent mb-1">14</p>
+                                <p class="text-gray-400 text-sm">Territories</p>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-5 text-center">
+                                <p class="text-3xl font-bold text-purple-500 mb-1">7</p>
+                                <p class="text-gray-400 text-sm">Day Streak</p>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="bg-dark-900 rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm text-gray-400">Weekly Goal Progress</span>
+                                <span class="text-sm font-semibold text-primary">78%</span>
+                            </div>
+                            <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
+                                <div class="h-full w-[78%] bg-gradient-to-r from-primary to-emerald-400 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Activity Graph Placeholder -->
+                        <div class="mt-6">
+                            <div class="flex items-end justify-between h-24 px-2">
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 40%"></div>
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 65%"></div>
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 45%"></div>
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 80%"></div>
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 60%"></div>
+                                <div class="w-8 bg-gradient-to-t from-primary/50 to-primary rounded-t" style="height: 90%"></div>
+                                <div class="w-8 bg-gradient-to-t from-secondary/50 to-secondary rounded-t" style="height: 70%"></div>
+                            </div>
+                            <div class="flex justify-between mt-2 px-2 text-xs text-gray-500">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative elements -->
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+                    <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary/10 rounded-full blur-2xl"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Section -->
+    <section class="py-16 bg-dark-950">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-r from-red-500/5 via-orange-500/5 to-red-500/5 border border-red-500/20 rounded-2xl p-8">
+                <div class="flex flex-col md:flex-row items-start gap-6">
+                    <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-8 h-8 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8v4"/>
+                            <path d="M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Safety First</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Territory Run is designed for <span class="text-white font-medium">pedestrian use only</span>. 
+                            Always be aware of your surroundings. Do not run into traffic, restricted areas, or private property. 
+                            Stay on sidewalks and designated paths. <span class="text-white font-medium">Your safety is more important than any territory.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-24 lg:py-32 bg-dark-900 relative overflow-hidden">
+        <!-- Background -->
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-secondary/5"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px]"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                Ready to Claim Your Territory?
+            </h2>
+            <p class="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
+                Join players already competing in your area. Start your first run today and see how much territory you can capture.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="login.html" class="w-full sm:w-auto group bg-gradient-to-r from-primary to-emerald-600 hover:from-primary hover:to-primary text-white px-10 py-5 rounded-xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-primary/30 flex items-center justify-center space-x-3">
+                    <span>Get Started Free</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </div>
+            <p class="mt-6 text-gray-500 text-sm flex items-center justify-center space-x-2">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>No credit card required. Free to play forever.</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark-950 border-t border-white/5 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                            <line x1="9" y1="3" x2="9" y2="18"/>
+                            <line x1="15" y1="6" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold">
+                        Territory<span class="text-primary">Run</span>
+                    </span>
+                </a>
+
+                <!-- Links -->
+                <div class="flex items-center space-x-8 text-sm text-gray-400">
+                    <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+                    <a href="#features" class="hover:text-white transition-colors">Features</a>
+                    <a href="#why" class="hover:text-white transition-colors">Why Us</a>
+                </div>
+
+                <!-- Copyright -->
+                <p class="text-gray-500 text-sm">
+                    © <span id="year">year</span> Territory Run. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+    
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            // Toggle hamburger to X
+            const icon = mobileMenuBtn.querySelector('svg');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>';
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/>';
+            }
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                const icon = mobileMenuBtn.querySelector('svg');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>';
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Apply fade-in to sections
+        document.querySelectorAll('section').forEach(section => {
+            const content = section.querySelector(':scope > div');
+            if (content) {
+                content.style.opacity = '0';
+                content.style.transform = 'translateY(30px)';
+                content.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(content);
+            }
+        });
+
+        // Navbar transparency on scroll
+        const nav = document.querySelector('nav');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.classList.add('bg-dark-950/95');
+                nav.classList.remove('bg-dark-950/80');
+            } else {
+                nav.classList.remove('bg-dark-950/95');
+                nav.classList.add('bg-dark-950/80');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        const year = document.getElementById("year");
+        year.textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
