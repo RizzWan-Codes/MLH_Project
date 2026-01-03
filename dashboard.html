@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Territory Run</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        dark: { 950: '#050507', 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24' },
+                        accent: '#F59E0B'
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .profile-card {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar-glow {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-dark-950 text-white antialiased min-h-screen">
+
+    <canvas id="bgCanvas" class="fixed inset-0 z-0"></canvas>
+    <div class="fixed inset-0 z-0 bg-gradient-to-b from-dark-950/50 to-dark-950/90 pointer-events-none"></div>
+
+    <div class="relative z-10 min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="p-6">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+                <div class="inline-flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                            <line x1="9" y1="3" x2="9" y2="18"/>
+                            <line x1="15" y1="6" x2="15" y2="21"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">
+                        Territory<span class="text-primary">Run</span>
+                    </span>
+                </div>
+
+                <button onclick="handleLogout()" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl transition-all hover:scale-105 flex items-center space-x-2">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span class="font-medium">Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex items-center justify-center p-6">
+            <div class="w-full max-w-2xl">
+                
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center">
+                    <div class="inline-flex items-center space-x-3 text-gray-400">
+                        <svg class="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        <span>Loading profile...</span>
+                    </div>
+                </div>
+
+                <!-- Profile Card -->
+                <div id="profileCard" class="profile-card bg-dark-900/70 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl hidden">
+                    
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold mb-2">Your Profile</h1>
+                        <p class="text-gray-400">Territory Runner Dashboard</p>
+                    </div>
+
+                    <div class="flex flex-col items-center space-y-6">
+                        
+                        <!-- Avatar -->
+                        <div class="relative">
+                            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/30 avatar-glow">
+                                <img id="userAvatar" src="" alt="User Avatar" class="w-full h-full object-cover">
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 bg-primary text-dark-950 rounded-full px-3 py-1 text-sm font-bold shadow-lg">
+                                Lvl <span id="userLevel">1</span>
+                            </div>
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="w-full space-y-4">
+                            
+                            <div class="bg-dark-800/50 border border-white/5 rounded-xl p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Gamertag</p>
+                                        <p class="text-lg font-semibold" id="userGamertag">Loading...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-dark-800/50 border border-white/5 rounded-xl p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Email</p>
+                                        <p class="text-lg font-semibold" id="userEmail">Loading...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-dark-800/50 border border-white/5 rounded-xl p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                            <line x1="9" y1="3" x2="9" y2="18"/>
+                                            <line x1="15" y1="6" x2="15" y2="21"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Territories Captured</p>
+                                        <p class="text-lg font-semibold" id="userTerritories">0</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-dark-800/50 border border-white/5 rounded-xl p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2v20M2 12h20"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Experience Points</p>
+                                        <p class="text-lg font-semibold" id="userXP">0 XP</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Configuration
+        // REPLACE THESE WITH YOUR ACTUAL FIREBASE CONFIG
+        const firebaseConfig = {
+  apiKey: "AIzaSyAqIobLBC_cfW_hfw5P073Go_dW7MbLR6s",
+  authDomain: "territory-run-e7df3.firebaseapp.com",
+  projectId: "territory-run-e7df3",
+  storageBucket: "territory-run-e7df3.firebasestorage.app",
+  messagingSenderId: "733520135692",
+  appId: "1:733520135692:web:74923175464454eb7cd029"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                console.log('User logged in:', user);
+                await loadUserProfile(user);
+            } else {
+                // User is signed out - redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load user profile data
+        async function loadUserProfile(user) {
+            try {
+                // Get user data from Firestore
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                
+                let userData = {
+                    gamertag: user.displayName || 'Runner',
+                    email: user.email,
+                    avatarUrl: user.photoURL || 'https://api.dicebear.com/9.x/avataaars/svg?seed=default',
+                    level: 1,
+                    xp: 0,
+                    territoriesCaptured: 0
+                };
+
+                // If Firestore data exists, use it
+                if (userDoc.exists()) {
+                    userData = { ...userData, ...userDoc.data() };
+                }
+
+                // Update UI
+                document.getElementById('userAvatar').src = userData.avatarUrl;
+                document.getElementById('userGamertag').textContent = userData.gamertag;
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('userLevel').textContent = userData.level;
+                document.getElementById('userTerritories').textContent = userData.territoriesCaptured;
+                document.getElementById('userXP').textContent = `${userData.xp} XP`;
+
+                // Show profile card, hide loading
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('profileCard').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                
+                // Fallback to auth data if Firestore fails
+                document.getElementById('userAvatar').src = user.photoURL || 'https://api.dicebear.com/9.x/avataaars/svg?seed=default';
+                document.getElementById('userGamertag').textContent = user.displayName || 'Runner';
+                document.getElementById('userEmail').textContent = user.email;
+                
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('profileCard').classList.remove('hidden');
+            }
+        }
+
+        // Logout function
+        window.handleLogout = async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Failed to logout. Please try again.');
+            }
+        };
+    </script>
+
+    <script>
+        // Background Wave Animation
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        const gridSize = 50;
+        
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        
+        function draw() {
+            ctx.fillStyle = '#050507'; 
+            ctx.fillRect(0, 0, width, height);
+            const time = Date.now() * 0.0015;
+            
+            for (let x = 0; x <= width + gridSize; x += gridSize) {
+                for (let y = 0; y <= height + gridSize; y += gridSize) {
+                    const waveX = Math.sin((x * 0.004) + time);
+                    const waveY = Math.cos((y * 0.004) + time);
+                    const combinedWave = (waveX + waveY) / 2;
+                    let opacity = 0.03 + (Math.max(0, combinedWave) * 0.25);
+                    
+                    let r = 255, g = 255, b = 255;
+                    if (combinedWave > 0.5) {
+                        const intensity = (combinedWave - 0.5) * 2;
+                        r = 255 - (239 * intensity); g = 255 - (70 * intensity); b = 255 - (126 * intensity);
+                    }
+
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + gridSize, y); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + gridSize); ctx.stroke();
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
