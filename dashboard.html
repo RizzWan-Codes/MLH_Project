@@ -634,37 +634,49 @@
         // LOAD USER DATA
         // ================================
         async function loadUserData(user) {
-            try {
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDocSnap = await getDoc(userDocRef);
+    try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
 
-                if (userDocSnap.exists()) {
-                    window.userData = userDocSnap.data();
-                } else {
-                    // Create default user data if doesn't exist
-                    const defaultData = {
-                        gamertag: user.displayName || 'Runner' + user.uid.substring(0, 6),
-                        email: user.email || user.phoneNumber || 'Unknown',
-                        avatarUrl: user.photoURL || `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.uid}`,
-                        coins: 0,
-                        totalArea: 0,
-                        territoriesCaptured: 0,
-                        createdAt: new Date().toISOString(),
-                        lastActive: new Date().toISOString()
-                    };
-                    
-                    await setDoc(userDocRef, defaultData);
-                    window.userData = defaultData;
-                }
-
-                // Update UI with user data
-                updateUserUI();
-                
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                showToast('Failed to load user data', 'error');
+        if (userDocSnap.exists()) {
+            window.userData = userDocSnap.data();
+            
+            // MIGRATION: Add missing fields if they don't exist
+            if (window.userData.totalArea === undefined || window.userData.coins === undefined) {
+                await updateDoc(userDocRef, {
+                    totalArea: window.userData.totalArea || 0,
+                    coins: window.userData.coins || 0
+                });
+                window.userData.totalArea = window.userData.totalArea || 0;
+                window.userData.coins = window.userData.coins || 0;
             }
+        } else {
+            // Create default user data if doesn't exist
+            const defaultData = {
+                gamertag: user.displayName || 'Runner' + user.uid.substring(0, 6),
+                email: user.email || user.phoneNumber || 'Unknown',
+                avatarUrl: user.photoURL || `https://api.dicebear.com/9.x/avataaars/svg?seed=${user.uid}`,
+                coins: 0,                    // ADD THIS
+                totalArea: 0,                // ADD THIS
+                territoriesCaptured: 0,
+                level: 1,                    // OPTIONAL: Add level
+                xp: 0,                       // OPTIONAL: Add XP
+                createdAt: new Date().toISOString(),
+                lastActive: new Date().toISOString()
+            };
+            
+            await setDoc(userDocRef, defaultData);
+            window.userData = defaultData;
         }
+
+        // Update UI with user data
+        updateUserUI();
+        
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        showToast('Failed to load user data', 'error');
+    }
+}
 
         // ================================
         // UPDATE USER UI
@@ -687,40 +699,58 @@
         // LEADERBOARD REAL-TIME LISTENER
         // ================================
         function setupLeaderboardListener() {
-            const usersRef = collection(db, 'users');
-            const leaderboardQuery = query(usersRef, orderBy('totalArea', 'desc'), limit(10));
+    const usersRef = collection(db, 'users');
+    
+    // Query all users and sort by totalArea (defaults to 0 if missing)
+    const leaderboardQuery = query(usersRef, orderBy('createdAt', 'desc'));
 
-            onSnapshot(leaderboardQuery, (snapshot) => {
-                const leaderboardContainer = document.getElementById('leaderboard');
-                leaderboardContainer.innerHTML = '';
+    onSnapshot(leaderboardQuery, (snapshot) => {
+        const leaderboardContainer = document.getElementById('leaderboard');
+        leaderboardContainer.innerHTML = '';
 
-                if (snapshot.empty) {
-                    leaderboardContainer.innerHTML = `
-                        <div class="text-center py-8 text-gray-500">
-                            <p class="text-sm">No players yet. Be the first!</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                let rank = 1;
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const isCurrentUser = doc.id === window.currentUser?.uid;
-                    
-                    const entryHTML = createLeaderboardEntry(rank, data, isCurrentUser);
-                    leaderboardContainer.innerHTML += entryHTML;
-                    rank++;
-                });
-            }, (error) => {
-                console.error('Leaderboard error:', error);
-                document.getElementById('leaderboard').innerHTML = `
-                    <div class="text-center py-8 text-red-400">
-                        <p class="text-sm">Failed to load leaderboard</p>
-                    </div>
-                `;
-            });
+        if (snapshot.empty) {
+            leaderboardContainer.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <p class="text-sm">No players yet. Be the first!</p>
+                </div>
+            `;
+            return;
         }
+
+        // Get all users and sort manually by totalArea
+        const users = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            users.push({
+                id: doc.id,
+                ...data,
+                totalArea: data.totalArea || 0,  // Default to 0 if missing
+                coins: data.coins || 0            // Default to 0 if missing
+            });
+        });
+
+        // Sort by totalArea descending
+        users.sort((a, b) => b.totalArea - a.totalArea);
+
+        // Take top 10
+        const top10 = users.slice(0, 10);
+
+        let rank = 1;
+        top10.forEach((data) => {
+            const isCurrentUser = data.id === window.currentUser?.uid;
+            const entryHTML = createLeaderboardEntry(rank, data, isCurrentUser);
+            leaderboardContainer.innerHTML += entryHTML;
+            rank++;
+        });
+    }, (error) => {
+        console.error('Leaderboard error:', error);
+        document.getElementById('leaderboard').innerHTML = `
+            <div class="text-center py-8 text-red-400">
+                <p class="text-sm">Failed to load leaderboard</p>
+            </div>
+        `;
+    });
+}
 
         // ================================
         // CREATE LEADERBOARD ENTRY HTML
