@@ -341,6 +341,16 @@
             gap: 8px;
         }
         .follow-indicator.hidden { display: none; }
+
+
+
+@media (max-width: 768px) {
+    .live-stats-panel {
+        left: 12px;
+        right: 12px;
+        min-width: unset;
+    }
+}
     </style>
 </head>
 <body class="bg-dark-950 text-white antialiased">
@@ -470,57 +480,77 @@
                 </button>
             </div>
 
-            <!-- LIVE STATS PANEL - Shows during run -->
-            <div id="liveStatsPanel" class="live-stats-panel hidden">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider">Live Run</span>
-                    <span id="runStatusBadge" class="status-badge status-running">
-                        <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                        Running
-                    </span>
-                </div>
-                
-                <div class="live-stat">
-                    <span class="live-stat-label">Distance</span>
-                    <span id="liveDistance" class="live-stat-value large">0 m</span>
-                </div>
-                
-                <div class="live-stat">
-                    <span class="live-stat-label">Duration</span>
-                    <span id="liveDuration" class="live-stat-value">00:00</span>
-                </div>
-                
-                <div class="live-stat">
-                    <span class="live-stat-label">Points</span>
-                    <span id="livePoints" class="live-stat-value">0</span>
-                </div>
-                
-                <div class="live-stat">
-                    <span class="live-stat-label">Area</span>
-                    <span id="liveArea" class="live-stat-value">0 m²</span>
-                </div>
-                
-                <div class="live-stat">
-                    <span class="live-stat-label">To Start</span>
-                    <span id="liveToStart" class="live-stat-value">-- m</span>
-                </div>
+            <!-- LIVE STATS PANEL - Retractable -->
+             <!-- Stats Menu Button (shows when panel is closed during run) -->
+<button id="statsMenuBtn" onclick="toggleStatsPanel(true)" class="hidden absolute top-24 left-6 z-[100] p-3 bg-dark-900/90 backdrop-blur-lg rounded-xl border border-primary/30 shadow-lg hover:bg-dark-800 transition-all">
+    <div class="flex items-center space-x-2">
+        <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+        <span class="text-primary text-sm font-medium">Stats</span>
+    </div>
+</button>
+<div id="liveStatsPanel" class="live-stats-panel hidden">
+    <!-- Close Button -->
+    <button onclick="toggleStatsPanel(false)" class="absolute top-2 right-2 p-1 hover:bg-white/10 rounded-lg transition-all">
+        <svg class="w-4 h-4 text-gray-400 hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+    </button>
+    
+    <div class="flex items-center justify-between mb-3 pr-6">
+        <span class="text-xs text-gray-400 uppercase tracking-wider">Live Run</span>
+        <span id="runStatusBadge" class="status-badge status-running">
+            <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            Running
+        </span>
+    </div>
+    
+    <!-- Rest of your stats content stays the same -->
+    <div class="live-stat">
+        <span class="live-stat-label">Distance</span>
+        <span id="liveDistance" class="live-stat-value large">0 m</span>
+    </div>
+    
+    <div class="live-stat">
+        <span class="live-stat-label">Duration</span>
+        <span id="liveDuration" class="live-stat-value">00:00</span>
+    </div>
+    
+    <div class="live-stat">
+        <span class="live-stat-label">Points</span>
+        <span id="livePoints" class="live-stat-value">0</span>
+    </div>
+    
+    <div class="live-stat">
+        <span class="live-stat-label">Area</span>
+        <span id="liveArea" class="live-stat-value">0 m²</span>
+    </div>
+    
+    <div class="live-stat">
+        <span class="live-stat-label">To Start</span>
+        <span id="liveToStart" class="live-stat-value">-- m</span>
+    </div>
 
-                <div class="live-stat">
-                    <span class="live-stat-label">Speed</span>
-                    <span id="liveSpeed" class="live-stat-value">0 km/h</span>
-                </div>
-                
-                <!-- Loop Progress -->
-                <div id="loopProgressContainer" class="mt-3 hidden">
-                    <div class="flex justify-between text-xs mb-1">
-                        <span class="text-gray-400">Loop Progress</span>
-                        <span id="loopProgressText" class="text-primary">0%</span>
-                    </div>
-                    <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
-                        <div id="loopProgressBar" class="h-full bg-primary transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
+    <div class="live-stat">
+        <span class="live-stat-label">Speed</span>
+        <span id="liveSpeed" class="live-stat-value">0 km/h</span>
+    </div>
+    
+    <!-- Loop Progress -->
+    <div id="loopProgressContainer" class="mt-3 hidden">
+        <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-400">Loop Progress</span>
+            <span id="loopProgressText" class="text-primary">0%</span>
+        </div>
+        <div class="h-2 bg-dark-700 rounded-full overflow-hidden">
+            <div id="loopProgressBar" class="h-full bg-primary transition-all duration-300" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+
 
             <!-- Map Container -->
             <div id="map"></div>
@@ -630,7 +660,7 @@
         window.gpsWatchId = null;
         window.currentPosition = null;
         window.canCloseLoop = false;
-        window.followMode = true; // Auto-center on user
+        window.followMode = false; // Auto-center on user
 
         // Speed tracking
         window.lastPositionTime = null;
@@ -817,6 +847,23 @@
             document.getElementById('sidebarOverlay').classList.toggle('hidden');
         }
         window.toggleSidebar = toggleSidebar;
+
+        // Toggle Stats Panel
+function toggleStatsPanel(show) {
+    const panel = document.getElementById('liveStatsPanel');
+    const menuBtn = document.getElementById('statsMenuBtn');
+    
+    if (show) {
+        panel.classList.remove('hidden');
+        menuBtn.classList.add('hidden');
+    } else {
+        panel.classList.add('hidden');
+        if (window.isRunning) {
+            menuBtn.classList.remove('hidden');
+        }
+    }
+}
+window.toggleStatsPanel = toggleStatsPanel;
 
         function dismissWarning() {
             const warning = document.getElementById('safetyWarning');
@@ -1126,25 +1173,36 @@
         // UPDATE TRAIL POLYLINE ON MAP
         // ================================
         function updateTrailOnMap() {
-            if (!window.mapInstance || window.runPath.length < 1) return;
+    if (!window.mapInstance || window.runPath.length < 1) return;
 
-            const pathCoords = window.runPath.map(p => [p.lng, p.lat]);
+    const pathCoords = window.runPath.map(p => [p.lng, p.lat]);
 
-            if (window.trailPolyline) {
-                try {
-                    window.trailPolyline.remove();
-                } catch(e) {}
-            }
+    if (window.trailPolyline) {
+        try { window.trailPolyline.remove(); } catch(e) {}
+    }
 
-            // Create new polyline with updated path
-            window.trailPolyline = new mappls.Polyline({
-                map: window.mapInstance,
-                paths: pathCoords,
-                strokeColor: '#10B981',
-                strokeOpacity: 1,
-                strokeWeight: 5
-            });
-        }
+    // Create trail with thicker, more visible border
+    window.trailPolyline = new mappls.Polyline({
+        map: window.mapInstance,
+        paths: pathCoords,
+        strokeColor: '#10B981',  // Green trail
+        strokeOpacity: 1,
+        strokeWeight: 6  // Thicker line
+    });
+
+    // Also draw a subtle "shadow" line behind for better visibility
+    if (window.trailShadow) {
+        try { window.trailShadow.remove(); } catch(e) {}
+    }
+
+    window.trailShadow = new mappls.Polyline({
+        map: window.mapInstance,
+        paths: pathCoords,
+        strokeColor: '#064E3B',  // Darker green shadow
+        strokeOpacity: 0.5,
+        strokeWeight: 10
+    });
+}
 
         // ================================
         // UPDATE LIVE STATS DURING RUN
@@ -1238,8 +1296,8 @@
                 center: [window.currentPosition.lng, window.currentPosition.lat],
                 zoom: 18
             });
-            window.followMode = true;
-            document.getElementById('followIndicator').classList.remove('hidden');
+            
+            
         }
         window.centerOnUser = centerOnUser;
 
@@ -1258,7 +1316,6 @@
             window.runPath = [];
             window.runStartTime = Date.now();
             window.canCloseLoop = false;
-            window.followMode = true;
 
             // Add starting point
             window.runPath.push({
@@ -1272,6 +1329,7 @@
             document.getElementById('stopRunBtn').classList.remove('hidden');
             document.getElementById('stopRunBtn').classList.add('flex');
             document.getElementById('liveStatsPanel').classList.remove('hidden');
+            document.getElementById('statsMenuBtn').classList.add('hidden'); // Add this
             document.getElementById('followIndicator').classList.remove('hidden');
 
             // Hide safe zone
@@ -1393,6 +1451,9 @@
             document.getElementById('liveStatsPanel').classList.add('hidden');
             document.getElementById('loopProgressContainer').classList.add('hidden');
             document.getElementById('followIndicator').classList.add('hidden');
+            // In endRun(), add:
+document.getElementById('liveStatsPanel').classList.add('hidden');
+document.getElementById('statsMenuBtn').classList.add('hidden');
 
             // Remove start marker
             if (window.startMarker) {
@@ -1413,29 +1474,78 @@
             if (window.currentPosition) {
                 showSafeZone(window.currentPosition.lat, window.currentPosition.lng);
             }
+
+            // In endRun(), add:
+if (window.trailShadow) {
+    try { window.trailShadow.remove(); } catch(e) {}
+    window.trailShadow = null;
+}
         }
 
         // ================================
         // DRAW CAPTURED POLYGON (GREEN FILL)
         // ================================
         function drawCapturedPolygon(path) {
-            if (!window.mapInstance) return;
+    if (!window.mapInstance) return;
 
-            const coords = path.map(p => [p.lng, p.lat]);
+    const coords = path.map(p => [p.lng, p.lat]);
+    
+    // Calculate center of polygon for the label
+    let centerLat = 0, centerLng = 0;
+    path.forEach(p => {
+        centerLat += p.lat;
+        centerLng += p.lng;
+    });
+    centerLat /= path.length;
+    centerLng /= path.length;
 
-            const polygon = new mappls.Polygon({
-                map: window.mapInstance,
-                paths: coords,
-                fillColor: '#10B981',
-                fillOpacity: 0.4,
-                strokeColor: '#059669',
-                strokeOpacity: 1,
-                strokeWeight: 3
-            });
+    // Draw the green filled polygon with border
+    const polygon = new mappls.Polygon({
+        map: window.mapInstance,
+        paths: coords,
+        fillColor: '#10B981',
+        fillOpacity: 0.35,
+        strokeColor: '#059669',
+        strokeOpacity: 1,
+        strokeWeight: 3
+    });
 
-            window.capturedPolygons.push(polygon);
-            console.log('✅ Captured polygon drawn');
-        }
+    window.capturedPolygons.push(polygon);
+
+    // Add "Occupied By" label
+    const gamertag = window.userData?.gamertag || 'You';
+    const area = Math.round(calculatePolygonArea(path));
+    
+    const labelEl = document.createElement('div');
+    labelEl.innerHTML = `
+        <div style="
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            border-radius: 8px;
+            padding: 6px 10px;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        ">
+            <div style="font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px;">Occupied By</div>
+            <div style="font-size: 13px; font-weight: 600; color: #10B981;">${gamertag}</div>
+            <div style="font-size: 11px; color: #6B7280;">${area} m²</div>
+        </div>
+    `;
+
+    const labelMarker = new mappls.Marker({
+        map: window.mapInstance,
+        position: new mappls.LatLng(centerLat, centerLng),
+        element: labelEl,
+        fitbounds: false
+    });
+
+    // Store label reference for potential removal later
+    window.capturedPolygons.push(labelMarker);
+
+    console.log(`✅ Territory captured by ${gamertag}: ${area} m²`);
+}
 
         // ================================
         // KEYBOARD SHORTCUTS
