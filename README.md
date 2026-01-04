@@ -941,4 +941,4 @@ This hackathon project taught us that the best ideas come from solving real prob
 
 ---
 
-*Built with for [Hackathon Name] by [Your Team Name]*
+*Built with for Hacks For Hackers by Rizwan Syed*
